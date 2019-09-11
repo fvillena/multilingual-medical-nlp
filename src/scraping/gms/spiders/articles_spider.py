@@ -40,6 +40,6 @@ class ArticlesSpider(scrapy.Spider):
     def download_xml(self, response):
         print("downloading :"+response.url)
         identifier = response.xpath("//GmsArticle//MetaData//Identifier/text()").extract_first()
-        filename = '../../data/raw/%s.xml' % identifier
+        filename = '../../data/raw/ges/%s.xml' % identifier
         with open(filename, 'wb') as f:
             f.write(response.body)
