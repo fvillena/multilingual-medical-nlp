@@ -1,5 +1,5 @@
-from src.data.ges_data import GesParser
+from src.data.gms_data import GmsParser
 
-ges_parser = GesParser(r"data/raw/ges/")
+gms_parser = GmsParser(r"data/raw/gms/")
 
-ges_parser.parse()
+gms_parser.parse()
