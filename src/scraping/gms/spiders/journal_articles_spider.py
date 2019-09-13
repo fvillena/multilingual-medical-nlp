@@ -3,7 +3,7 @@ import scrapy
 import re
 import html
 import random
-class ArticlesSpider(scrapy.Spider):
+class JournalArticlesSpider(scrapy.Spider):
     name = 'journal_articles'
     allowed_domains = ['egms.de']
     start_urls = ['https://www.egms.de/static/en/journals/index.htm']
