@@ -1,16 +1,20 @@
 import os
 import json
+from spacy.lang.fr import French
+from spacy.lang.de import German
+from spacy.lang.en import English
 def tokenize(document,language):
     if language == 'fr':
-        from spacy.lang.fr import French
         nlp = French()
-        sentencizer = nlp.create_pipe("sentencizer")
-        nlp.add_pipe(sentencizer)
-        doc = nlp(document)
-        sentences = [[str(word) for word in sent if str(word) != '\n'] for sent in doc.sents]
-        return sentences
-    else:
-        return []
+    if language == 'de':
+        nlp = German()
+    if language == 'en':
+        nlp = French()
+    sentencizer = nlp.create_pipe("sentencizer")
+    nlp.add_pipe(sentencizer)
+    doc = nlp(document)
+    sentences = [[str(word) for word in sent if str(word) != '\n'] for sent in doc.sents]
+    return sentences
 
 class TextProcessor:
     def __init__(self, text_folder):
