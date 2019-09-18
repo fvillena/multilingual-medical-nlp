@@ -8,6 +8,22 @@ def normalize_language_name(language):
         language = 'en'
     if language == 'germ':
         language = 'de'
+    if language == 'fren':
+        language = 'fr'
+    if language == 'ger':
+        language = 'de'
+    if language == 'eng':
+        language = 'en'
+    if language == 'deutsch':
+        language = 'de'
+    if language == 'german':
+        language = 'de'
+    if language == 'germ225':
+        language = 'de'
+    if language == 'ebgl':
+        language = 'en'
+    if language == 'engl.':
+        language = 'en'
     return language
 def parse_languages(soup):
     languages = [soup.find('language').text]
