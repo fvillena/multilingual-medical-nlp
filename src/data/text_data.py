@@ -45,3 +45,18 @@ class TextProcessor:
                 document_to_write = '\n'.join(document_to_write)
                 with open(output_folder + language + '/' + hashlib.md5(document_to_write.encode('utf-8')).hexdigest() +'.txt', 'w') as f:
                     f.write(document_to_write)
+class TextAnalyzer:
+    def __init__(self, corpora_folder):
+        self.files = {language:[] for language in os.listdir(corpora_folder)}
+        for language in self.files.keys():
+            document_files = [corpora_folder + language + '/' + document_file for document_file in os.listdir(corpora_folder + language)]
+            self.files[language] = document_files
+    def load_files(self):
+        self.corpora = {language:[] for language in self.files.keys()}
+        for corpus,files in self.files.items():
+            for document_file in files:
+                with open(document_file, 'r', encoding='utf-8') as f:
+                    article = f.read()
+                article = article.replace('\n',' ')
+                article = article.split(' ')
+                self.corpora[corpus].extend(article)
