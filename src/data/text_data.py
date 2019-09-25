@@ -1,10 +1,21 @@
 import os
 import json
 import hashlib
+import collections
+from collections import Counter
+from sklearn.feature_extraction.text import TfidfVectorizer
 from spacy.lang.fr import French
 from spacy.lang.de import German
 from spacy.lang.en import English
 from spacy.lang.es import Spanish
+def flatten(x):
+    result = []
+    for el in x:
+        if isinstance(x, collections.Iterable) and not isinstance(el, str):
+            result.extend(flatten(el))
+        else:
+            result.append(el)
+    return result
 def tokenize(document,language,punctutation):
     if language == 'fr':
         nlp = French()
@@ -51,12 +62,42 @@ class TextAnalyzer:
         for language in self.files.keys():
             document_files = [corpora_folder + language + '/' + document_file for document_file in os.listdir(corpora_folder + language)]
             self.files[language] = document_files
-    def load_files(self):
+    def load_files(self, restrict_documents=0):
         self.corpora = {language:[] for language in self.files.keys()}
         for corpus,files in self.files.items():
+            if restrict_documents:
+                if len(files) > restrict_documents:
+                    files = files[:restrict_documents]
             for document_file in files:
                 with open(document_file, 'r', encoding='utf-8') as f:
                     article = f.read()
                 article = article.replace('\n',' ')
                 article = article.split(' ')
-                self.corpora[corpus].extend(article)
+                self.corpora[corpus].append(article)
+    def tfidf_analysis(self):
+        self.corpora_idf = {language:[] for language in self.files.keys()}
+        for language in self.corpora_idf:
+            corpus = [' '.join(document) for document in self.corpora[language]]
+            vectorizer = TfidfVectorizer()
+            vectorizer.fit(corpus)
+            vocab = vectorizer.get_feature_names()
+            idf = vectorizer.idf_
+            word_idf = list(zip(vocab,idf))
+            word_idf = sorted(word_idf, key=lambda x: x[1], reverse=True)
+            self.corpora_idf[language] = word_idf
+    def tf_analysis(self):
+        self.corpora_tf = {language:[] for language in self.files.keys()}
+        for language in self.corpora_tf:
+            counter = Counter(flatten(self.corpora[language]))
+            self.corpora_tf[language] = counter.most_common()
+    def generate_report(self):
+        self.report = {language:{} for language in self.files.keys()}
+        for language in self.report.keys():
+            self.report[language]['n_documents'] = len(self.corpora[language])
+            self.report[language]['n_words'] = len(flatten(self.corpora[language]))
+            self.report[language]['vocab_size'] = len(set(flatten(self.corpora[language])))
+            try: self.report[language]['idf'] = self.corpora_idf[language][:100]
+            except: pass
+            try: self.report[language]['tf'] = self.corpora_tf[language][:100]
+            except: pass
+        return self.report
