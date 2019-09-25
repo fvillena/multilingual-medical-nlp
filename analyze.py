@@ -13,3 +13,6 @@ processor = TextProcessor(r'data/interim/')
 processor.process(output_folder = r'data/processed/', punctutation=False)
 
 analyzer = TextAnalyzer(r'data/processed/')
+analyzer.load_files()
+analyzer.tfidf_analysis()
+analyzer.generate_report()
