@@ -2,6 +2,7 @@ import os
 import json
 import hashlib
 import collections
+import operator
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from spacy.lang.fr import French
@@ -101,3 +102,19 @@ class TextAnalyzer:
             try: self.report[language]['tf'] = self.corpora_tf[language][:100]
             except: pass
         return self.report
+
+class MyTfidfAnalyzer:
+    def __init__(self, tf_file_location, idf_file_location):
+        with open(tf_file_location, 'r', encoding='utf-8') as f:
+            self.tf = json.load(f)
+        with open(idf_file_location, 'r', encoding='utf-8') as f:
+            self.idf = json.load(f)
+        self.tf = {corpus:dict(data) for corpus,data in self.tf.items()}
+        self.idf = {corpus:dict(data) for corpus,data in self.idf.items()}
+    def analyze(self):
+        self.tfidf = {
+            language:sorted({
+                word:self.tf[language][word]*(self.idf[language][word] - 1) for word in self.tf[language] if word in self.idf[language]
+                }.items(), key=operator.itemgetter(1), reverse=True) for language in self.idf
+            }
+        
